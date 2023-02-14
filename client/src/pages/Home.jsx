@@ -7,18 +7,44 @@ const RenderCards = ({ data, title }) => {
   }
 
   return (
-    <h2 className="mt-5 font-bold text-[#6449ff] text-xl uppercase">
-      {title}
-    </h2>
-  )
-    
+    <h2 className="mt-5 font-bold text-[#6449ff] text-xl uppercase">{title}</h2>
+  );
 };
 
 const Home = () => {
   const [loading, setloading] = useState(false);
-  const [allPosts, setallPosts] = useState(null);
+  const [allPosts, setallPosts] = useState([]);
 
   const [searchText, setsearchText] = useState("");
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setloading(true);
+
+      try {
+        const response = await fetch("http://localhost:8080/api/v1/post", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(response)
+        if (response.ok) {
+          const result = await response.json();
+          console.log(result)
+          // setallPosts(result.data.reverse());
+          setallPosts(result.data.reverse());
+        }
+      } catch (error) {
+        // alert(error);
+        console.log(error)
+      } finally {
+        setloading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
     <section className="max-w-7xl mx-auto">
@@ -51,15 +77,9 @@ const Home = () => {
             )}
             <div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
               {searchText ? (
-                <RenderCards 
-                  data={[]}
-                  title="No search results found"
-                />
+                <RenderCards data={[]} title="No search results found" />
               ) : (
-                <RenderCards 
-                  data={[]}
-                  title="No posts found"
-                />
+                <RenderCards data={allPosts} title="No posts found" />
               )}
             </div>
           </>

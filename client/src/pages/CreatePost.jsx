@@ -7,19 +7,19 @@ import { FormField, Loader } from "../components";
 
 const CreatePost = () => {
   const navigate = useNavigate();
-  const [form, setform] = useState({
+  const [form, setForm] = useState({
     name: "",
     prompt: "",
     photo: "",
   });
 
-  const [generatingImg, setgeneratingImg] = useState(false);
+  const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const generateImage = async () => {
     if (form.prompt) {
       try {
-        setgeneratingImg(true);
+        setGeneratingImg(true);
         const response = await fetch("http://localhost:8080/api/v1/dalle", {
           method: "POST",
           headers: {
@@ -29,26 +29,52 @@ const CreatePost = () => {
         });
 
         const data = await response.json();
-        setform({ ...form, photo: `data:image/jpeg;base64, ${data.photo}` });
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` });
       } catch (error) {
         alert(error);
       } finally {
-        setgeneratingImg(false);
+        setGeneratingImg(false);
       }
     } else {
-      alert('Please enter a prompt')
+      alert("Please enter a prompt");
     }
   };
 
-  const handleSubmit = () => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (form.prompt && form.photo) {
+      setLoading(true);
+      console.log('handleSubmit')
+
+      try {
+        const response = await fetch("http://localhost:8080/api/v1/post", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({...form}),
+        });
+
+        await response.json();
+        navigate("/");
+      } catch (error) {
+        alert(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert("Please enter a prompt and generate an image");
+    }
+  };
 
   const handleChange = (e) => {
-    setform({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSurpriseMe = () => {
     const randomPrompt = getRandomPrompt(form.prompt);
-    setform({ ...form, prompt: randomPrompt });
+    setForm({ ...form, prompt: randomPrompt });
   };
 
   return (
