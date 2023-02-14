@@ -16,13 +16,7 @@ cloudinary.config({
 
 router.route("/").get(async (req, res) => {
   try {
-    console.log('get data')
-
     const posts = await Post.find({});
-    console.log(posts)
-    // const posts = {
-    //     _id: 1
-    // }
     res.status(200).json({ success: true, data: posts });
   } catch (error) {
     res.status(500).json({ success: true, message: error });
@@ -32,7 +26,6 @@ router.route("/").get(async (req, res) => {
 router.route("/").post(async (req, res) => {
   try {
     const { name, prompt, photo } = req.body;
-    console.log('photo:' , photo)
     const photoUrl = await cloudinary.uploader.upload(photo);
 
     const newPost = await Post.create({
@@ -40,7 +33,6 @@ router.route("/").post(async (req, res) => {
       prompt,
       photo: photoUrl.url,
     });
-
 
     res.status(200).json({ success: true, data: newPost });
   } catch (error) {

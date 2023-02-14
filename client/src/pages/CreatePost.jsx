@@ -45,7 +45,6 @@ const CreatePost = () => {
 
     if (form.prompt && form.photo) {
       setLoading(true);
-      console.log('handleSubmit')
 
       try {
         const response = await fetch("http://localhost:8080/api/v1/post", {
